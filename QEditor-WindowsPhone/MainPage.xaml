@@ -1,0 +1,21 @@
+﻿<Page
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:QEditor_WindowsPhone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Maps="using:Windows.UI.Xaml.Controls.Maps"
+    x:Class="QEditor_WindowsPhone.MainPage"
+    mc:Ignorable="d">
+
+    <Grid Margin="0,0.333,0,97.167">
+        <TextBlock x:Name="procT" TextWrapping="Wrap" Text="TextBlock" Margin="10,10,253,513"/>
+        <TextBlock x:Name="statusT1" HorizontalAlignment="Left" Margin="174,10,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="216" Height="22"/>
+        <StackPanel Margin="10,116,10,32">
+            <Maps:MapControl x:Name="Map" VerticalAlignment="Bottom" Height="551"/>
+
+        </StackPanel>
+        <Button x:Name="locateButton" Content="ý" HorizontalAlignment="Right" Margin="0,585,10,-100" VerticalAlignment="Top" FontFamily="Webdings" Width="43" Height="53" Click="Button_Click" />
+        <Button x:Name="startButton" Content="Spustit" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="264" Click="start_Click" Height="54" Margin="10,0,0,-100"/>
+    </Grid>
+</Page>
