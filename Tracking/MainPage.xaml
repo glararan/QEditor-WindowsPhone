@@ -10,9 +10,11 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Maps:MapControl x:Name="Map" HorizontalAlignment="Left" Margin="10,49,0,0" VerticalAlignment="Top" Width="380" Height="520"/>
-        <ToggleSwitch Header="Zapisování:" HorizontalAlignment="Left" Margin="10,575,0,0" VerticalAlignment="Top" Toggled="ToggleSwitch_Toggled" Width="248"/>
+
+        <Maps:MapControl x:Name="Map" HorizontalAlignment="Left" Margin="10,49,0,0" VerticalAlignment="Top" Width="380" Height="524"/>
         <TextBlock x:Name="procT" TextWrapping="Wrap" Text="TextBlock" Margin="10,10,270,596"/>
         <TextBlock x:Name="statusT1" HorizontalAlignment="Left" Margin="130,10,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="260" Height="34"/>
+        <Button x:Name="startButton" Content="Spustit" HorizontalAlignment="Left" Margin="10,582,0,0" VerticalAlignment="Top" Width="380" Click="start_Click"/>
+
     </Grid>
 </Page>

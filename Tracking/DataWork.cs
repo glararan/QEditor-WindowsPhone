@@ -21,98 +21,15 @@ namespace Tracking
             }
 
         }
-        private double getBigX(List<PointA> track)
-        {
-            double nej;
-            if (track[0].X > track[1].X)
-            {
-                nej = track[0].X;
-            }
-            else
-            {
-                nej = track[1].X;
-            }
-            for (int i = 2; i < track.Count; i++)
-            {
-                if (nej < track[i].X)
-                {
-                    nej = track[i].X;
-                }
-            }
-            return nej;
-        }
-
-        private double getLittleX(List<PointA> track)
-        {
-            double nej;
-            if (track[0].X > track[1].X)
-            {
-                nej = track[1].X;
-            }
-            else
-            {
-                nej = track[0].X;
-            }
-            for (int i = 2; i < track.Count; i++)
-            {
-                if (nej > track[i].X)
-                {
-                    nej = track[i].X;
-                }
-            }
-            return nej;
-        }
-
-        private double getBigY(List<PointA> track)
-        {
-            double nej;
-            if (track[0].X > track[1].X)
-            {
-                nej = track[0].X;
-            }
-            else
-            {
-                nej = track[1].X;
-            }
-            for (int i = 2; i < track.Count; i++)
-            {
-                if (nej < track[i].X)
-                {
-                    nej = track[i].X;
-                }
-            }
-            return nej;
-        }
-
-        private double getLittleY(List<PointA> track)
-        {
-            double nej;
-            if (track[0].X > track[1].X)
-            {
-                nej = track[1].X;
-            }
-            else
-            {
-                nej = track[0].X;
-            }
-            for (int i = 2; i < track.Count; i++)
-            {
-                if (nej > track[i].X)
-                {
-                    nej = track[i].X;
-                }
-            }
-            return nej;
-        }
 
         public void dataWork(List<PointA> track)
         {
-            double x0 = getLittleX(track);
-            double x1 = getBigX(track);
-            double y0 = getLittleY(track);
-            double y1 = getBigY(track);
+            double x0 = track.Min(e => e.X);
+            double x1 = track.Max(e => e.X);
+            double y0 = track.Min(e => e.Y);
+            double y1 = track.Max(e => e.Y);
 
-            Point point1=new Point();
+            Point point1 = new Point();
             Point point2 = new Point();
             Point point3 = new Point();
             Point point4 = new Point();
