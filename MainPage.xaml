@@ -15,7 +15,7 @@
             <Maps:MapControl x:Name="Map" VerticalAlignment="Bottom" Height="551"/>
 
         </StackPanel>
-        <Button x:Name="locateButton" Content="ý" HorizontalAlignment="Right" Margin="0,585,10,-100" VerticalAlignment="Top" FontFamily="Webdings" Width="43" Height="53" Click="Button_Click" IsEnabled="False"/>
+        <Button x:Name="locateButton" Content="ý" HorizontalAlignment="Right" Margin="0,585,10,-100" VerticalAlignment="Top" FontFamily="Webdings" Width="43" Height="53" Click="Button_Click" />
         <Button x:Name="startButton" Content="Spustit" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="264" Click="start_Click" Height="54" Margin="10,0,0,-100"/>
     </Grid>
 </Page>

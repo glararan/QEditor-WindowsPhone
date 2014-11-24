@@ -17,7 +17,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
 using Windows.UI.Xaml.Resources;
 
@@ -69,6 +68,22 @@ namespace Tracking
                     Latitude =pointA.X,
                     Longitude = pointA.Y
                 });
+             if (tracking)
+             {
+                 try
+                 {
+                     Map.Center = geopoint;
+                     Map.ZoomLevel = 12;
+                     geolocator = new Geolocator();
+                     tracking = false;
+                 }
+                 catch (Exception)
+                 {
+                     
+                     throw;
+                 }
+
+             }
 
         }
 
@@ -100,39 +115,69 @@ namespace Tracking
 
        private void start_Click(object sender, RoutedEventArgs e)
        {
-           if (!tracking)
-           {
-               geolocator = new Geolocator();
-               geolocator.DesiredAccuracy = PositionAccuracy.High;
-               geolocator.MovementThreshold = 100;
-
-               geolocator.StatusChanged += geolocator_StatusChanged;
-               geolocator.PositionChanged += geolocator_PositionChanged;
-
-               tracking = true;
-               procT.Text = "Zaznamenávání dat..";
-               startButton.Content = "Zastavit";
-               locateButton.IsEnabled = true;
-           }
-           else
-           {
-               geolocator.PositionChanged -= geolocator_PositionChanged;
-               geolocator.StatusChanged -= geolocator_StatusChanged;
-               geolocator = null;
-
-               tracking = false;
-               procT.Text = "Vypnuto";
-               startButton.Content = "Spustit";
-               locateButton.IsEnabled = false;
-           }
+           work();
        }
 
        private void Button_Click(object sender, RoutedEventArgs e)
        {
-           Map.Center = geopoint;
-           Map.ZoomLevel = 12;
-           Map.LandmarksVisible = true;
+           geolocator.DesiredAccuracy = PositionAccuracy.High;
+           geolocator.MovementThreshold = 100;
+
+           geolocator.StatusChanged += geolocator_StatusChanged;
+           geolocator.PositionChanged += geolocator_PositionChanged;
+           tracking = true;
        }
+
+        private void work()
+        {
+            Geopoint topLeft, topRight, botLeft, botRight;
+
+            Map.GetLocationFromOffset(new Point(0, 0), out topLeft);
+            Map.GetLocationFromOffset(new Point(0, Map.Height), out botLeft);
+            Map.GetLocationFromOffset(new Point(Map.Width, 0), out topRight);
+            Map.GetLocationFromOffset(new Point(Map.Width, Map.Height), out botRight);
+
+            double topleft = topLeft.Position.Altitude;
+            double topright = topRight.Position.Altitude;
+            double botleft = botLeft.Position.Altitude;
+            double botright = botRight.Position.Altitude;
+            double[] mapData = new double[Settings.TILE_WIDTH * Settings.TILE_HEIGHT / Settings.CHUNKS / Settings.CHUNKS];
+            // row column
+            int rc = Settings.TILE_WIDTH / Settings.CHUNKS;
+
+            // calc row min to row max, cell min to cell max first and last index
+            for (int y = 0; y < rc; ++y)
+            {
+                mapData[y * rc] = topleft - (topleft - botleft) / (rc - 1) * y;
+                mapData[y * rc + rc - 1] = topright - (topright - botright) / (rc - 1) * y;
+            }
+
+            for (int x = 0; x < rc; ++x)
+            {
+                mapData[x] = topleft - (topleft - topright) / (rc - 1) * x;
+                mapData[x + (rc - 1) * rc] = botleft - (botleft - botright) / (rc - 1) * x;
+            }
+
+            // calc data
+            for (int x = 0; x < rc; ++x)
+            {
+                if (x <= 0 || x >= rc - 1)
+                    continue;
+
+                for (int y = 0; y < rc; ++y)
+                {
+                    if (y <= 0 || y >= rc - 1)
+                        continue;
+
+                    double currLeft = mapData[y * rc];
+                    double currRight = mapData[y * rc + rc - 1];
+
+                    mapData[x + rc * y] = currLeft - ((currLeft - currRight) / (rc - 1)) * x;
+                }
+            }
+
+
+        }
 
     }
 }

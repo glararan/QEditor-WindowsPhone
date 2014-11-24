@@ -30,7 +30,6 @@
       <RootProperty Name="FontFamily" />
       <RootProperty Name="Width" />
       <RootProperty Name="Height" />
-      <RootProperty Name="IsEnabled" />
       <RootEvent Name="Click" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.Maps.MapControl">
