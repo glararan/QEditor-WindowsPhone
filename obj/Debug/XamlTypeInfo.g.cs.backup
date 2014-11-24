@@ -124,15 +124,19 @@ namespace Tracking.Tracking_XamlTypeInfo
 
         private void InitTypeTables()
         {
-            _typeNameTable = new string[3];
-            _typeNameTable[0] = "Tracking.MainPage";
-            _typeNameTable[1] = "Windows.UI.Xaml.Controls.Page";
-            _typeNameTable[2] = "Windows.UI.Xaml.Controls.UserControl";
+            _typeNameTable = new string[5];
+            _typeNameTable[0] = "System.Collections.Generic.IList`1<Windows.UI.Xaml.DependencyObject>";
+            _typeNameTable[1] = "Windows.UI.Xaml.DependencyObject";
+            _typeNameTable[2] = "Tracking.MainPage";
+            _typeNameTable[3] = "Windows.UI.Xaml.Controls.Page";
+            _typeNameTable[4] = "Windows.UI.Xaml.Controls.UserControl";
 
-            _typeTable = new global::System.Type[3];
-            _typeTable[0] = typeof(global::Tracking.MainPage);
-            _typeTable[1] = typeof(global::Windows.UI.Xaml.Controls.Page);
-            _typeTable[2] = typeof(global::Windows.UI.Xaml.Controls.UserControl);
+            _typeTable = new global::System.Type[5];
+            _typeTable[0] = typeof(global::System.Collections.Generic.IList<global::Windows.UI.Xaml.DependencyObject>);
+            _typeTable[1] = typeof(global::Windows.UI.Xaml.DependencyObject);
+            _typeTable[2] = typeof(global::Tracking.MainPage);
+            _typeTable[3] = typeof(global::Windows.UI.Xaml.Controls.Page);
+            _typeTable[4] = typeof(global::Windows.UI.Xaml.Controls.UserControl);
         }
 
         private int LookupTypeIndexByName(string typeName)
@@ -167,7 +171,13 @@ namespace Tracking.Tracking_XamlTypeInfo
             return -1;
         }
 
-        private object Activate_0_MainPage() { return new global::Tracking.MainPage(); }
+        private object Activate_2_MainPage() { return new global::Tracking.MainPage(); }
+        private void VectorAdd_0_IList(object instance, object item)
+        {
+            var collection = (global::System.Collections.Generic.ICollection<global::Windows.UI.Xaml.DependencyObject>)instance;
+            var newItem = (global::Windows.UI.Xaml.DependencyObject)item;
+            collection.Add(newItem);
+        }
 
         private global::Windows.UI.Xaml.Markup.IXamlType CreateXamlType(int typeIndex)
         {
@@ -179,18 +189,28 @@ namespace Tracking.Tracking_XamlTypeInfo
             switch (typeIndex)
             {
 
-            case 0:   //  Tracking.MainPage
+            case 0:   //  System.Collections.Generic.IList`1<Windows.UI.Xaml.DependencyObject>
+                userType = new global::Tracking.Tracking_XamlTypeInfo.XamlUserType(this, typeName, type, null);
+                userType.CollectionAdd = VectorAdd_0_IList;
+                xamlType = userType;
+                break;
+
+            case 1:   //  Windows.UI.Xaml.DependencyObject
+                xamlType = new global::Tracking.Tracking_XamlTypeInfo.XamlSystemBaseType(typeName, type);
+                break;
+
+            case 2:   //  Tracking.MainPage
                 userType = new global::Tracking.Tracking_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Windows.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_0_MainPage;
+                userType.Activator = Activate_2_MainPage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 1:   //  Windows.UI.Xaml.Controls.Page
+            case 3:   //  Windows.UI.Xaml.Controls.Page
                 xamlType = new global::Tracking.Tracking_XamlTypeInfo.XamlSystemBaseType(typeName, type);
                 break;
 
-            case 2:   //  Windows.UI.Xaml.Controls.UserControl
+            case 4:   //  Windows.UI.Xaml.Controls.UserControl
                 xamlType = new global::Tracking.Tracking_XamlTypeInfo.XamlSystemBaseType(typeName, type);
                 break;
             }

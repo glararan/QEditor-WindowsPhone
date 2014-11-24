@@ -6,15 +6,16 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:Maps="using:Windows.UI.Xaml.Controls.Maps"
     x:Class="Tracking.MainPage"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    mc:Ignorable="d">
 
-    <Grid>
+    <Grid Margin="0,0.333,0,97.167">
+        <TextBlock x:Name="procT" TextWrapping="Wrap" Text="TextBlock" Margin="10,10,253,513"/>
+        <TextBlock x:Name="statusT1" HorizontalAlignment="Left" Margin="174,10,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="216" Height="22"/>
+        <StackPanel Margin="10,116,10,32">
+            <Maps:MapControl x:Name="Map" VerticalAlignment="Bottom" Height="551"/>
 
-        <Maps:MapControl x:Name="Map" HorizontalAlignment="Left" Margin="10,49,0,0" VerticalAlignment="Top" Width="380" Height="524"/>
-        <TextBlock x:Name="procT" TextWrapping="Wrap" Text="TextBlock" Margin="10,10,270,596"/>
-        <TextBlock x:Name="statusT1" HorizontalAlignment="Left" Margin="130,10,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="260" Height="34"/>
-        <Button x:Name="startButton" Content="Spustit" HorizontalAlignment="Left" Margin="10,582,0,0" VerticalAlignment="Top" Width="380" Click="start_Click"/>
-
+        </StackPanel>
+        <Button x:Name="locateButton" Content="ý" HorizontalAlignment="Right" Margin="0,585,10,-100" VerticalAlignment="Top" FontFamily="Webdings" Width="43" Height="53" Click="Button_Click" IsEnabled="False"/>
+        <Button x:Name="startButton" Content="Spustit" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="264" Click="start_Click" Height="54" Margin="10,0,0,-100"/>
     </Grid>
 </Page>

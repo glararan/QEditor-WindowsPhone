@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -22,21 +23,27 @@ using Windows.UI.Xaml.Resources;
 
 namespace Tracking
 {
+    
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        //Stopwatch stopwatch=new Stopwatch();
         public bool start = false;
         public bool tracking = false;
         Geolocator geolocator = null;
+        Geopoint geopoint;
         List<DataWork.PointA> track = new List<DataWork.PointA>();
 
         public MainPage()
         {
-
             this.InitializeComponent();
             this.NavigationCacheMode = NavigationCacheMode.Required;
+            Map.Width = Window.Current.Bounds.Width;
+            Map.Height = Window.Current.Bounds.Width;
+            Map.TrafficFlowVisible = false;
+
         }
 
         /// <summary>
@@ -49,16 +56,23 @@ namespace Tracking
 
         }
 
-        async void geolocator_PositionChanged(Geolocator sender, PositionChangedEventArgs args)
+         void geolocator_PositionChanged(Geolocator sender, PositionChangedEventArgs args)
         {
+
             DataWork.PointA pointA = new DataWork.PointA();
             pointA.X = double.Parse(args.Position.Coordinate.Latitude.ToString());
             pointA.Y = double.Parse(args.Position.Coordinate.Longitude.ToString());
             pointA.Z = double.Parse(args.Position.Coordinate.Altitude.ToString());
             track.Add(pointA);
+             geopoint=new Geopoint(new BasicGeoposition()
+                {
+                    Latitude =pointA.X,
+                    Longitude = pointA.Y
+                });
+
         }
 
-       async void geolocator_StatusChanged(Geolocator sender, StatusChangedEventArgs args)
+        void geolocator_StatusChanged(Geolocator sender, StatusChangedEventArgs args)
         {
 
             switch (args.Status)
@@ -98,6 +112,7 @@ namespace Tracking
                tracking = true;
                procT.Text = "Zaznamenávání dat..";
                startButton.Content = "Zastavit";
+               locateButton.IsEnabled = true;
            }
            else
            {
@@ -108,7 +123,15 @@ namespace Tracking
                tracking = false;
                procT.Text = "Vypnuto";
                startButton.Content = "Spustit";
+               locateButton.IsEnabled = false;
            }
+       }
+
+       private void Button_Click(object sender, RoutedEventArgs e)
+       {
+           Map.Center = geopoint;
+           Map.ZoomLevel = 12;
+           Map.LandmarksVisible = true;
        }
 
     }
