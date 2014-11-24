@@ -46,39 +46,7 @@ namespace Tracking
         /// This parameter is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            // TODO: Prepare page for display here.
 
-            // TODO: If your application contains multiple pages, ensure that you are
-            // handling the hardware Back button by registering for the
-            // Windows.Phone.UI.Input.HardwareButtons.BackPressed event.
-            // If you are using the NavigationHelper provided by some templates,
-            // this event is handled for you.
-        }
-
-        private async void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
-        {
-
-            if (!tracking)
-            {
-                geolocator = new Geolocator();
-                geolocator.DesiredAccuracy = PositionAccuracy.High;
-                geolocator.MovementThreshold = 100;
-
-                geolocator.StatusChanged += geolocator_StatusChanged;
-                geolocator.PositionChanged += geolocator_PositionChanged;
-
-                tracking = true;
-                procT.Text = "Zaznamenávání dat..";
-            }
-            else
-            {
-                geolocator.PositionChanged -= geolocator_PositionChanged;
-                geolocator.StatusChanged -= geolocator_StatusChanged;
-                geolocator = null;
-
-                tracking = false;
-                procT.Text = "Vypnuto";
-            }
         }
 
         async void geolocator_PositionChanged(Geolocator sender, PositionChangedEventArgs args)
@@ -90,10 +58,10 @@ namespace Tracking
             track.Add(pointA);
         }
 
-       async void geolocator_StatusChanged(Geolocator sender, StatusChangedEventArgs args)
+        async void geolocator_StatusChanged(Geolocator sender, StatusChangedEventArgs args)
         {
 
-            switch (args.Status)
+            switch(args.Status)
             {
                 case PositionStatus.Disabled:
                     statusT1.Text = "Povolte sledování v nastavení.";
@@ -113,6 +81,33 @@ namespace Tracking
                 case PositionStatus.NotInitialized:
                     statusT1.Text = "Nepodařilo se získat připojení";
                     break;
+            }
+        }
+
+        private void start_Click(object sender, RoutedEventArgs e)
+        {
+            if(!tracking)
+            {
+                geolocator = new Geolocator();
+                geolocator.DesiredAccuracy = PositionAccuracy.High;
+                geolocator.MovementThreshold = 100;
+
+                geolocator.StatusChanged += geolocator_StatusChanged;
+                geolocator.PositionChanged += geolocator_PositionChanged;
+
+                tracking = true;
+                procT.Text = "Zaznamenávání dat..";
+                startButton.Content = "Zastavit";
+            }
+            else
+            {
+                geolocator.PositionChanged -= geolocator_PositionChanged;
+                geolocator.StatusChanged -= geolocator_StatusChanged;
+                geolocator = null;
+
+                tracking = false;
+                procT.Text = "Vypnuto";
+                startButton.Content = "Spustit";
             }
         }
 
