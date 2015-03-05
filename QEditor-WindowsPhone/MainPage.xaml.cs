@@ -3,128 +3,65 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading;
-using System.Xml.Linq;
+using System.Net;
 using Windows.Devices.Geolocation;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
-using Windows.UI.Xaml.Resources;
+using Windows.UI.Xaml.Media;
+using System.Net.Http;
+using System.Threading.Tasks;
+using AsyncOAuth;
+using AsyncOAuth.WindowsPhone;
+using Windows.UI.Popups;
+using Newtonsoft.Json.Linq;
+using System.Globalization;
+using System.Threading;
+using System.Text;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using System.Runtime.Serialization;
 
 namespace QEditor_WindowsPhone
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
-        //Stopwatch stopwatch=new Stopwatch();
-        public bool start    = false;
-        public bool tracking = false;
+        float[] mapData = null;
 
-        Geolocator geolocator = null;
-        Geopoint geopoint;
-        List<DataWork.PointA> track = new List<DataWork.PointA>();
+        List<Task> threads = new List<Task>();
+
+        string[] thread_results = null;
 
         public MainPage()
         {
             this.InitializeComponent();
-            this.NavigationCacheMode = NavigationCacheMode.Required;
-            Map.Width = Window.Current.Bounds.Width;
+
+            Map.Width  = Window.Current.Bounds.Width;
             Map.Height = Window.Current.Bounds.Width;
             Map.TrafficFlowVisible = false;
 
+            Initialization = getTwitter();
         }
 
-        /// <summary>
-        /// Invoked when this page is about to be displayed in a Frame.
-        /// </summary>
-        /// <param name="e">Event data that describes how this page was reached.
-        /// This parameter is typically used to configure the page.</param>
+        public Task Initialization { get; private set; }
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-
+            
         }
 
-        void geolocator_PositionChanged(Geolocator sender, PositionChangedEventArgs args)
+        private async void start_Click(object sender, RoutedEventArgs e)
         {
-            DataWork.PointA pointA = new DataWork.PointA();
-            pointA.X = double.Parse(args.Position.Coordinate.Latitude.ToString());
-            pointA.Y = double.Parse(args.Position.Coordinate.Longitude.ToString());
-            pointA.Z = double.Parse(args.Position.Coordinate.Altitude.ToString());
-            track.Add(pointA);
-             geopoint=new Geopoint(new BasicGeoposition()
-                {
-                    Latitude =pointA.X,
-                    Longitude = pointA.Y
-                });
-             if (tracking)
-             {
-                 try
-                 {
-                     Map.Center = geopoint;
-                     Map.ZoomLevel = 12;
-                     geolocator = new Geolocator();
-                     tracking = false;
-                 }
-                 catch (Exception)
-                 {
-                     
-                     throw;
-                 }
-             }
+            threads.Clear();
+
+            mapData = null;
+
+            await work();
         }
 
-        void geolocator_StatusChanged(Geolocator sender, StatusChangedEventArgs args)
-        {
-            switch (args.Status)
-            {
-                case PositionStatus.Disabled:
-                    statusT1.Text = "Povolte sledování v nastavení.";
-                    break;
-                case PositionStatus.Initializing:
-                    statusT1.Text = "Čekání na data...";
-                    break;
-                case PositionStatus.NoData:
-                    statusT1.Text = "Data nejsou k dispozici.";
-                    break;
-                case PositionStatus.Ready:
-                    statusT1.Text = "Data k dispozici...";
-                    break;
-                case PositionStatus.NotAvailable:
-                    statusT1.Text = "Připojení není dispozici";
-                    break;
-                case PositionStatus.NotInitialized:
-                    statusT1.Text = "Nepodařilo se získat připojení";
-                    break;
-            }
-        }
-
-       private void start_Click(object sender, RoutedEventArgs e)
-       {
-           work();
-       }
-
-       private void Button_Click(object sender, RoutedEventArgs e)
-       {
-           geolocator.DesiredAccuracy = PositionAccuracy.High;
-           geolocator.MovementThreshold = 100;
-
-           geolocator.StatusChanged += geolocator_StatusChanged;
-           geolocator.PositionChanged += geolocator_PositionChanged;
-           tracking = true;
-       }
-
-        private void work()
+        private async Task work()
         {
             Geopoint topLeft, topRight, botLeft, botRight;
 
@@ -133,60 +70,185 @@ namespace QEditor_WindowsPhone
             Map.GetLocationFromOffset(new Point(Map.Width, 0), out topRight);
             Map.GetLocationFromOffset(new Point(Map.Width, Map.Height), out botRight);
 
-            double[] mapData = new double[Settings.TILE_WIDTH * Settings.TILE_HEIGHT]; // Tile data
+            mapData = new float[Settings.TILE_WIDTH * Settings.TILE_HEIGHT];
 
-            double xDiff = Map.Width  / Settings.TILE_WIDTH;  //(topRight.Position.Latitude  - topLeft.Position.Latitude)   / Settings.TILE_WIDTH;
-            double yDiff = Map.Height / Settings.TILE_HEIGHT; //(topRight.Position.Longitude - botRight.Position.Longitude) / Settings.TILE_HEIGHT;
+            double xDiff = Map.Width  / Settings.TILE_WIDTH;
+            double yDiff = Map.Height / Settings.TILE_HEIGHT;
 
-            for(int x = 0; x < Settings.TILE_WIDTH; x++)
+            progressBar.Value = 1;
+
+            for(int x = 0; x < 4; x++)
             {
-                for(int y = 0; y < Settings.TILE_HEIGHT; y++)
+                for(int y = 0; y < 4; y++)
+                    threads.Add(workPart(xDiff, yDiff, x * Settings.TILE_WIDTH / 4, y * Settings.TILE_HEIGHT / 4, (x + 1) * Settings.TILE_WIDTH / 4, (y + 1) * Settings.TILE_HEIGHT / 4));
+            }
+
+            await Task.WhenAll(threads.ToArray());
+
+            progressBar.Value = 50;
+
+            thread_results = new string[threads.Count()];
+
+            threads.Clear();
+
+            await saveData();
+        }
+
+        string googleAPI = "";
+
+        HttpClient client = new HttpClient();
+
+        private async Task workPart(double diffX, double diffY, int startX, int startY, int endX, int endY)
+        {
+            await Task.Run(() =>
+            {
+                double xDiff = diffX;
+                double yDiff = diffY;
+
+                for(int x = startX; x < endX; x++)
                 {
-                    Geopoint point;
+                    for(int y = startY; y < endY; y++)
+                    {
+                        Geopoint point;
 
-                    Map.GetLocationFromOffset(new Point(xDiff * x, yDiff * y), out point);
+                        Map.GetLocationFromOffset(new Point(xDiff * x, yDiff * y), out point);
 
-                    mapData[y * Settings.TILE_WIDTH + x] = point.Position.Altitude;
+                        string url = "https://maps.googleapis.com/maps/api/elevation/json?locations=" + point.Position.Latitude + "," + point.Position.Longitude + "&key=" + googleAPI;
+
+                        var result = await client.GetStringAsync(url);
+
+
+
+                        mapData[y * Settings.TILE_WIDTH + x] = (float)point.Position.Altitude;
+                    }
                 }
-            }
 
-            /*double topleft = topLeft.Position.Altitude;
-            double topright = topRight.Position.Altitude;
-            double botleft = botLeft.Position.Altitude;
-            double botright = botRight.Position.Altitude;
-            // row column
-            int rc = Settings.TILE_WIDTH / Settings.CHUNKS;
-
-            // calc row min to row max, cell min to cell max first and last index
-            for (int y = 0; y < rc; ++y)
-            {
-                mapData[y * rc] = topleft - (topleft - botleft) / (rc - 1) * y;
-                mapData[y * rc + rc - 1] = topright - (topright - botright) / (rc - 1) * y;
-            }
-
-            for (int x = 0; x < rc; ++x)
-            {
-                mapData[x] = topleft - (topleft - topright) / (rc - 1) * x;
-                mapData[x + (rc - 1) * rc] = botleft - (botleft - botright) / (rc - 1) * x;
-            }
-
-            // calc data
-            for (int x = 0; x < rc; ++x)
-            {
-                if (x <= 0 || x >= rc - 1)
-                    continue;
-
-                for (int y = 0; y < rc; ++y)
+                Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => 
                 {
-                    if (y <= 0 || y >= rc - 1)
-                        continue;
+                    progressBar.Value += 49 / threads.Count();
+                });
+            });
+        }
 
-                    double currLeft = mapData[y * rc];
-                    double currRight = mapData[y * rc + rc - 1];
+        private void Video_DoubleTapped(object sender, TappedRoutedEventArgs e)
+        {
+            Image target = (Image)sender;
 
-                    mapData[x + rc * y] = currLeft - ((currLeft - currRight) / (rc - 1)) * x;
+            var options              = new Windows.System.LauncherOptions();
+            options.TreatAsUntrusted = true;
+
+            var page = Windows.System.Launcher.LaunchUriAsync(new Uri(target.DataContext.ToString()), options);
+        }
+
+        private void PivotItem_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private async Task saveData()
+        {
+            progressBar.Value = 51;
+
+            for(int x = 0; x < 4; x++)
+            {
+                for(int y = 0; y < 4; y++)
+                    threads.Add(saveDataPart(x + (y * 4), x * Settings.TILE_WIDTH / 4, y * Settings.TILE_HEIGHT / 4, (x + 1) * Settings.TILE_WIDTH / 4, (y + 1) * Settings.TILE_HEIGHT / 4));
+            }
+
+            await Task.WhenAll(threads.ToArray());
+
+            progressBar.Value = 95;
+
+            string[] list = new string[threads.Count()];
+
+            StringBuilder paste = new StringBuilder();
+
+            for(int i = 0; i < threads.Count(); i++)
+                paste.Append(thread_results[i]);
+
+            string fileName = "test.txt";
+
+            byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(paste.ToString().ToCharArray());
+
+            StorageFolder externalDevices = Windows.Storage.KnownFolders.RemovableDevices;
+
+            var card = (await externalDevices.GetFoldersAsync()).FirstOrDefault();
+
+            if(card != null)
+            {
+                var dataFolder = await card.CreateFolderAsync("QEditor", CreationCollisionOption.OpenIfExists);
+
+                var file = await dataFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+
+                using(var s = await file.OpenStreamForWriteAsync())
+                {
+                    s.Write(fileBytes, 0, fileBytes.Length);
                 }
-            }*/
+
+                progressBar.Value = 99;
+
+                await new MessageDialog(String.Format("Soubor je zapsán do {0}", fileName)).ShowAsync();
+            }
+
+            progressBar.Value = 0;
+        }
+
+        private async Task saveDataPart(int index, int startX, int startY, int endX, int endY)
+        {
+            await Task.Run(() =>
+            {
+                StringBuilder _result = new StringBuilder();
+
+                for(int x = startX; x < endX; x++)
+                {
+                    for(int y = startY; y < endY; y++)
+                        _result.Append(x + " " + y + " " + mapData[x + (Settings.TILE_WIDTH * y)].ToString("n5") + "\n");
+                }
+
+                thread_results[index] = _result.ToString();
+
+                Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    progressBar.Value += 42 / threads.Count();
+                });
+            });
+        }
+
+        private void ListTweets_Loaded(object sender, RoutedEventArgs e)
+        {
+        }
+
+        async Task getTwitter()
+        {
+            const string consumerKey       = "UdfRBoxSG3AGg4mBfdQ";
+            const string consumerSecret    = "jlZRJOzZ4Io1biHq8rqEinDr6CjTRPWoUL793s4I";
+            const string accessTokenKey    = "2295754686-bfnEhEE8VUMFdj9AjYpkWsZuTPcYsqKLGYPWsFR";
+            const string accessTokenSecret = "XlqwBPE22jayivwgkEx7goRLi2g66PwkqttOlMa0tK3cM";
+
+            AccessToken accessToken = new AccessToken(accessTokenKey, accessTokenSecret);
+
+            var client = new TwitterClient(consumerKey, consumerSecret, accessToken); 
+ 
+            string timeline = await client.GetUserTimeline(5);
+
+            JArray array = JArray.Parse(timeline);
+
+            JToken token = array.First;
+
+            while(token != null)
+            {
+                string name = JObject.Parse(token.ToString()).Value<JToken>("user").Value<string>("name");
+                string text = token.Value<string>("text");
+                string date = token.Value<string>("created_at");
+
+                DateTime dTime = DateTime.ParseExact(date, "ddd MMM dd HH:mm:ss +ffff yyyy", CultureInfo.InvariantCulture);
+
+                ListTweets.Items.Add(String.Format("{0}: {1} - {2}", name, text, dTime));
+
+                token = token.Next;
+            }
         }
     }
+
 }
+

@@ -1,21 +1,83 @@
 ﻿<Page
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:QEditor_WindowsPhone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:QEditor_WindowsPhone"
     xmlns:Maps="using:Windows.UI.Xaml.Controls.Maps"
     x:Class="QEditor_WindowsPhone.MainPage"
     mc:Ignorable="d">
 
-    <Grid Margin="0,0.333,0,97.167">
-        <TextBlock x:Name="procT" TextWrapping="Wrap" Text="TextBlock" Margin="10,10,253,513"/>
-        <TextBlock x:Name="statusT1" HorizontalAlignment="Left" Margin="174,10,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="216" Height="22"/>
-        <StackPanel Margin="10,116,10,32">
-            <Maps:MapControl x:Name="Map" VerticalAlignment="Bottom" Height="551"/>
-
-        </StackPanel>
-        <Button x:Name="locateButton" Content="ý" HorizontalAlignment="Right" Margin="0,585,10,-100" VerticalAlignment="Top" FontFamily="Webdings" Width="43" Height="53" Click="Button_Click" />
-        <Button x:Name="startButton" Content="Spustit" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="264" Click="start_Click" Height="54" Margin="10,0,0,-100"/>
+    <Grid Margin="0,0.333,0,-0.333">
+        <Pivot Title="">
+            <PivotItem Header="Informace" Margin="19,23,19,9.5">
+                <Grid>
+                    <TextBlock x:Name="TitleHead" HorizontalAlignment="Left" Margin="10,135,0,0" TextWrapping="Wrap" Text="QEditor" VerticalAlignment="Top" FontSize="36" FontWeight="Bold" FontFamily="Assets/bankgthl.ttf#BankGothic Lt BT" Width="172"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="0,173,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="250" Width="352" FontSize="14" FontFamily="Segoe WP">
+                    	<Run Text="&#x9;"/>
+                    	<Run/>
+                    	<LineBreak/>
+                    	<Run Text="&#x9;"/>
+                    	<Run Text="QEditor je aplikace s rozsáhlou sadou nástrojů, které mají společný cíl – pomáhat při vytváření virtuálního světa či simulace světa."/>
+                    	<LineBreak/>
+                    	<Run/>
+                    	<LineBreak/>
+                    	<Run Text="&#x9;Aplikace využívá nejmodernější hardwarové a softwarové technologie. QEditor je možné spustit na operačních systémech Windows, kde má plnou podporu, taktéž lze i nově spustit pod operačním systémem Linux Debian, do budoucna plánujeme i podporu operačního systému Mac OS X."/>
+                    </TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Margin="0,429,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="57" Width="352">
+                    	<Run FontSize="18" Text="Odkaz"/>
+                    	<Run FontSize="18" Text="y"/>
+                    	<Run FontSize="18" Text=":"/>
+                    	<LineBreak/>
+                    	<Run FontSize="12" Text="http://qeditor.cz"/>
+                    	<LineBreak/>
+                    	<Run FontSize="12" Text="https://twitter.com/TheQEditor/"/>
+                    	<LineBreak/>
+                    	<Run/>
+                    </TextBlock>
+                    <Image Height="130" Margin="0,-18,0,408" Source="Images/1.jpg" VerticalAlignment="Center" Stretch="Fill"/>
+                </Grid>
+            </PivotItem>
+            <PivotItem Header="Videa" Margin="19,23,19,9.5">
+                <ScrollViewer Height="520">
+                    <StackPanel Height="700">
+                        <Grid>
+                            <Image Source="http://img.youtube.com/vi/UnCrlX8Z3gs/0.jpg" DataContext="https://www.youtube.com/embed/UnCrlX8Z3gs" Tapped="Video_DoubleTapped" Margin="0,-8,10,329" VerticalAlignment="Center" HorizontalAlignment="Center" Height="174" Width="352" Stretch="Fill"/>
+                            <Image Source="http://img.youtube.com/vi/wL-zWEgBy_I/0.jpg" DataContext="https://www.youtube.com/embed/wL-zWEgBy_I" Tapped="Video_DoubleTapped" Margin="0,184,10,162" VerticalAlignment="Center" HorizontalAlignment="Center" Height="174" Width="352" Stretch="Fill"/>
+                            <Image Source="http://img.youtube.com/vi/YmkjIbbTFe0/0.jpg" DataContext="https://www.youtube.com/embed/YmkjIbbTFe0" Tapped="Video_DoubleTapped" Margin="0,358,10,-12" VerticalAlignment="Center" HorizontalAlignment="Center" Height="174" Width="352" Stretch="Fill"/>
+                            <Image Source="http://img.youtube.com/vi/sekArynEHTs/0.jpg" DataContext="https://www.youtube.com/embed/sekArynEHTs" Tapped="Video_DoubleTapped" Margin="0,532,10,-186" VerticalAlignment="Center" HorizontalAlignment="Center" Height="174" Width="352" Stretch="Fill"/>
+                        
+                            <TextBlock TextWrapping="Wrap" Text="Alfa trailer" VerticalAlignment="Top" Height="33" Width="352" FontSize="16" FontFamily="Assets/bankgthd.ttf#BankGothic Md BT"/>
+                            <TextBlock TextWrapping="Wrap" Text="Rychlá ukázka 3" VerticalAlignment="Top" Height="33" Width="352" FontSize="16" Margin="0,184,0,0" FontFamily="Assets/bankgthd.ttf#BankGothic Md BT"/>
+                            <TextBlock TextWrapping="Wrap" Text="Rychlá ukázka 2 " VerticalAlignment="Top" Height="33" Width="352" FontSize="16" Margin="5,358,5,0" FontFamily="Assets/bankgthd.ttf#BankGothic Md BT"/>
+                            <TextBlock TextWrapping="Wrap" Text="Rychlá ukázka" VerticalAlignment="Top" Height="33" Width="352" FontSize="16" Margin="5,532,5,-45" FontFamily="Assets/bankgthd.ttf#BankGothic Md BT"/>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+            <PivotItem Header="Aplikace">
+                <ScrollViewer Margin="0,0,-0.333,0" Height="530" >
+                    <StackPanel Orientation="Vertical" Height="530" Width="362">
+                        <Grid Margin="0,0,-0.333,0" Height="600" >
+                            <StackPanel Margin="10,-3,10,100" Height="400" VerticalAlignment="Top">
+                                <Maps:MapControl x:Name="Map" VerticalAlignment="Bottom" Height="810"/>
+                            </StackPanel>
+                            <Button x:Name="startButton" Content="Zapsat data" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="342" Click="start_Click" Height="54" Margin="10,0,0,145"/>
+                            <ProgressBar x:Name="progressBar" Height="10" VerticalAlignment="Bottom" Margin="0,0,0,135"/>
+                            <TextBox x:Name="IPBox" TextWrapping="Wrap" Text="IP:Port" VerticalAlignment="Bottom" Margin="0,0,0,85"/>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+            <PivotItem Header="Twitter">
+                <Grid Margin="0">
+                    <TextBlock Margin="45,10,0,0" TextWrapping="Wrap" Text="@TheQEditor" VerticalAlignment="Top" FontSize="18" FontWeight="Bold" FontFamily="Assets/bankgthl.ttf#BankGothic Lt BT"/>
+                    <Grid VerticalAlignment="Top" Height="2" Margin="50,37,24,0" Background="White" />
+                    <Image HorizontalAlignment="Left" Height="42" VerticalAlignment="Top" Width="45" Source="Images/default_profile_1_normal.png"/>
+                    <TextBlock x:Name="T3" Margin="21,203,24,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="58"/>
+                    <ListBox x:Name="ListTweets" Height="473" Margin="21,47,0,0" Loaded="ListTweets_Loaded" VerticalAlignment="Top" FontSize="14"/>
+                </Grid>
+            </PivotItem>
+        </Pivot>
     </Grid>
 </Page>

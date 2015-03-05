@@ -16,15 +16,32 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Tracking.App">
-      <m3:VisualElements DisplayName="Tracking" Square150x150Logo="Assets\Logo.png" Square44x44Logo="Assets\SmallLogo.png" Description="Tracking" ForegroundText="light" BackgroundColor="transparent">
+      <m3:VisualElements DisplayName="QEditor" Square150x150Logo="Assets\Logo.png" Square44x44Logo="Assets\SmallLogo.png" Description="Informační aplikace o aplikaci QEditor" ForegroundText="light" BackgroundColor="transparent">
         <m3:DefaultTile Wide310x150Logo="Assets\WideLogo.png" Square71x71Logo="Assets\Square71x71Logo.png">
         </m3:DefaultTile>
         <m3:SplashScreen Image="Assets\SplashScreen.png" />
+        <m3:InitialRotationPreference>
+          <m3:Rotation Preference="portrait" />
+        </m3:InitialRotationPreference>
       </m3:VisualElements>
+      <Extensions>
+        <Extension Category="windows.fileTypeAssociation">
+          <FileTypeAssociation Name="text">
+            <DisplayName>Text File</DisplayName>
+            <SupportedFileTypes>
+              <FileType ContentType="text/plain">.txt</FileType>
+            </SupportedFileTypes>
+          </FileTypeAssociation>
+        </Extension>
+      </Extensions>
     </Application>
   </Applications>
   <Capabilities>
     <Capability Name="internetClientServer" />
+    <Capability Name="removableStorage" />
+    <Capability Name="musicLibrary" />
+    <Capability Name="enterpriseAuthentication" />
+    <Capability Name="sharedUserCertificates" />
     <DeviceCapability Name="location" />
   </Capabilities>
 </Package>

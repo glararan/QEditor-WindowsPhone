@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AsyncOAuth;
+using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -35,6 +35,20 @@ namespace QEditor_WindowsPhone
         {
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
+
+            AsyncOAuth.OAuthUtility.ComputeHash = (key, buffer) =>
+            {
+                var crypt = Windows.Security.Cryptography.Core.MacAlgorithmProvider.OpenAlgorithm("HMAC_SHA1");
+                var keyBuffer = Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(key);
+                var cryptKey = crypt.CreateKey(keyBuffer);
+
+                var dataBuffer = Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(buffer);
+                var signBuffer = Windows.Security.Cryptography.Core.CryptographicEngine.Sign(cryptKey, dataBuffer);
+
+                byte[] value;
+                Windows.Security.Cryptography.CryptographicBuffer.CopyToByteArray(signBuffer, out value);
+                return value;
+            };
         }
 
         /// <summary>
